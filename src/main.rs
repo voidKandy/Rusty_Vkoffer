@@ -1,13 +1,13 @@
 #![allow(unused)]
 
-use crate::embedding_data::sql_module;
+use crate::data_module::sql_module;
 use anyhow::{Context, Result};
 use clap::Parser;
 use std::fmt;
 use std::fs;
 use std::path;
 
-pub mod embedding_data;
+pub mod data_module;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -26,8 +26,9 @@ impl fmt::Display for Cli {
     }
 }
 
-fn main() -> Result<()> {
-    let pool = sql_module::create_pool();
+#[tokio::main]
+async fn main() -> Result<()> {
+    let pool = sql_module::create_pool().await?;
 
     Ok(())
 }
