@@ -10,7 +10,6 @@ use std::path;
 
 pub mod cli_module;
 pub mod data_module;
-pub mod load_decrypted_passwords;
 pub mod types_module;
 
 #[tokio::main]
@@ -23,9 +22,6 @@ async fn main() -> Result<()> {
     println!("{}", args);
 
     match args.pattern.as_str() {
-        "d" => {
-            load_decrypted_passwords::load_up_decrypts(&pool).await;
-        }
         "add" => {
             let password = cli_module::prompt_for_password(&pool).await;
             cli_module::create_new_password(password, &pool).await;
