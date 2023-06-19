@@ -10,7 +10,6 @@ use inquire::Text;
 use sqlx::Connection;
 use std::io::Error;
 use std::ops::IndexMut;
-use uuid::Uuid;
 
 pub async fn create_new_password(password: Password, pool: &sqlx::PgPool) -> Result<()> {
     sql_module::insert(&password, pool).await
@@ -46,7 +45,7 @@ pub async fn prompt_for_password(pool: &sqlx::PgPool) -> Password {
     match sql_module::password_exist(&temp_pass, pool).await {
         true => temp_pass,
         false => {
-            temp_pass.id = Uuid::new_v4().to_string();
+            temp_pass.generate_uuid();
             temp_pass
         }
     }

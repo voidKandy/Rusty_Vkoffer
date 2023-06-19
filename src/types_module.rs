@@ -7,6 +7,7 @@ use std::fmt;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::ops::{Index, IndexMut};
+use uuid::Uuid;
 // Interaction with a set of / a single saved password
 pub mod types {
 
@@ -42,6 +43,9 @@ pub mod types {
                 username: String::new(),
                 password: String::new(),
             }
+        }
+        pub fn generate_uuid(&mut self) {
+            self.id = Uuid::new_v4().to_string();
         }
         pub fn update_field(&mut self, field: &str, value: &str) {
             match field {
