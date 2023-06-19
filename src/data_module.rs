@@ -1,4 +1,5 @@
 #![allow(unused)]
+use crate::types_module::types::Password;
 use anyhow::Result;
 use dotenv::dotenv;
 use sqlx::Connection;
@@ -9,14 +10,6 @@ use std::error::Error;
 
 pub mod sql_module {
     use super::*;
-
-    #[derive(Debug, FromRow)]
-    pub struct Password {
-        pub id: String,
-        pub username: String,
-        pub password: String,
-        pub service: String,
-    }
 
     pub async fn create_pool() -> Result<sqlx::PgPool> {
         dotenv().ok();
@@ -34,11 +27,26 @@ pub mod sql_module {
 
     pub async fn read_by_key(key: &str, val: &str, pool: &sqlx::PgPool) -> Result<Vec<Password>> {
         let q = format!(
-            "SELECT id, username, password, service FROM password WHERE {} = $1",
+            "SELECT id, username, password, service FROM password WHERE {} ILIKE '%'||$1||'%'",
             key
         );
         let query = sqlx::query_as::<_, Password>(&q).bind(val);
         Ok(query.fetch_all(pool).await?)
+    }
+
+    pub async fn password_exist(password: &Password, pool: &sqlx::PgPool) -> bool {
+        let query = "SELECT EXISTS (SELECT * FROM password WHERE username = $1 AND password = $2 AND service = $3)";
+
+        let res: Result<(bool,), sqlx::Error> = sqlx::query_scalar(query)
+            .bind(&password.username)
+            .bind(&password.password)
+            .bind(&password.service)
+            .fetch_one(pool)
+            .await;
+        match res {
+            Ok((exists,)) => exists,
+            Err(error) => false,
+        }
     }
 
     pub async fn drop_by_key(key: &str, val: &str, pool: &sqlx::PgPool) -> Result<()> {
