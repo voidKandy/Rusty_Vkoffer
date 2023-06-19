@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
 
     match args.pattern.as_str() {
         "d" => {
-            load_decrypted_passwords::load_up_decrypts();
+            load_decrypted_passwords::load_up_decrypts(&pool).await;
         }
         "add" => {
             let password = cli_module::prompt_for_password(&pool).await;
