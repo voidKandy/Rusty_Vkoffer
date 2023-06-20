@@ -1,13 +1,11 @@
-use crate::cli_module::query_passwords;
-use inquire::Text;
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
 use sqlx::FromRow;
 use std::fmt;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::ops::{Index, IndexMut};
 use uuid::Uuid;
+
 // Interaction with a set of / a single saved password
 pub mod types {
 

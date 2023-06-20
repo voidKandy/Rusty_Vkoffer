@@ -7,9 +7,6 @@ use inquire::InquireError;
 use inquire::MultiSelect;
 use inquire::Select;
 use inquire::Text;
-use sqlx::Connection;
-use std::io::Error;
-use std::ops::IndexMut;
 
 pub async fn create_new_password(password: Password, pool: &sqlx::PgPool) -> Result<()> {
     sql_module::insert(&password, pool).await
@@ -91,6 +88,7 @@ pub async fn update_password(
     let options: &[&str] = &["service", "username", "password"];
     let ans: Result<Vec<&str>, InquireError> =
         MultiSelect::new("Update which fields?", options.to_vec()).prompt();
+
     match ans {
         Ok(fields) => {
             for field in fields {
@@ -98,10 +96,12 @@ pub async fn update_password(
                 password.update_field(field, &response);
                 println!("{}:{}", field, response);
             }
+            sql_module::update(&password, &pool).await.unwrap();
         }
         Err(error) => {
-            panic!("No fields provided");
+            panic!("Error: {error}");
         }
     }
+
     Ok(password)
 }
